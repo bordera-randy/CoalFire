@@ -26,4 +26,4 @@
         - Allow SSH from a specific IP or network space only
 
 ## Diagram
-![alt text](image.png)
+![diagram](image.png)
