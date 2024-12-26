@@ -1,48 +1,25 @@
 
+
+
 module "subnet_addrs" {
   source          = "hashicorp/subnets/cidr"
-  base_cidr_block = var.mgmt_network_cidr
+  base_cidr_block = local.network_cidr_blocks
   networks = [
     {
-      name     = "${local.resource_prefix}-public-sn-1"
-      new_bits = 8
+      name     = "Application"
+      new_bits = 5
     },
     {
-      name     = "${local.resource_prefix}-iam-sn-1"
-      new_bits = 8
+      name     = "Management"
+      new_bits = 5
     },
     {
-      name     = "${local.resource_prefix}-cicd-sn-1"
-      new_bits = 8
+      name     = "Backend"
+      new_bits = 5
     },
     {
-      name     = "${local.resource_prefix}-secops-sn-1"
-      new_bits = 8
-    },
-    {
-      name     = "${local.resource_prefix}-siem-sn-1"
-      new_bits = 8
-    },
-    {
-      name     = "${local.resource_prefix}-monitor-sn-1"
-      new_bits = 8
-    },
-    {
-      name     = "${local.resource_prefix}-bastion-sn-1"
-      new_bits = 8
-    },
-    {
-      name     = "AzureFirewallSubnet" #Per Azure docs, The Management Subnet used for the Firewall must have the name AzureFirewallManagementSubnet and the subnet mask must be at least a /26.
-      new_bits = 8
-    },
-    {
-      name     = "${local.resource_prefix}-pe-sn-1"
-      new_bits = 8
-    }
-    ,
-    {
-      name     = "${local.resource_prefix}-psql-sn-1"
-      new_bits = 8
+      name     = "Web"
+      new_bits = 5
     }
   ]
 }
