@@ -26,8 +26,6 @@
     - [Network](#network)
     - [Compute](#compute)
     - [Supporting Infrastructure](#supporting-infrastructure)
-- [Design decisions and assumptions](#design-decisions-and-assumptions)
-- [References to resources used](#references-to-resources-used)
 
 <!-- TOC end -->
 
@@ -130,6 +128,7 @@ The architecture consists of the following components:
 - **Notes**  
    - Virtual Machines were created without the use of modules. This was due to CoalFire not having a Linux module published. This also demonstrates the creation of resources without the use of a module. 
    - Virtual machine passwords were generated in the terraform randomly.
+   - variables are stored in local variables rather than tfvars file, this is personal preference. When building pipelines using local variables is easier to link to runtime parameters. 
 
 
 ## Assumptions
@@ -278,9 +277,3 @@ Best Practice: Always review the destruction plan before applying.
     - One container “terraformstate”
     - One container “weblogs”
 - One Load balancer that sends web traffic to the VMs in the availability set.
-
-<!-- TOC --><a name="design-decisions-and-assumptions"></a>
-# Design decisions and assumptions
-
-<!-- TOC --><a name="references-to-resources-used"></a>
-# References to resources used

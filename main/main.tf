@@ -130,7 +130,64 @@ resource "random_password" "vm_password" {
     special = true
 }
 
+# Create the Key Vault using the CoalFire module
+module "key_vault" {
+    source                          = "github.com/Coalfire-CF/terraform-azurerm-key-vault"
+    resource_group_name             = azurerm_resource_group.rg.name
+    location                        = local.location
+    kv_name                            = "${local.resource_prefix}-${local.iteration}-kv"
+    tenant_id                       = local.tenant_id
+    enabled_for_disk_encryption     = true
+    enabled_for_deployment          = true
+    enabled_for_template_deployment = true
+    tags                            = local.tags
+    diag_log_analytics_id           = azurerm_log_analytics_workspace.law.id
+    global_tags                     = local.tags
+    regional_tags                   = local.tags
+    depends_on                      = [azurerm_resource_group.rg]
+}
 
+resource "azurerm_key_vault_access_policy" "kv_access_policy" {
+    key_vault_id = module.key_vault.key_vault_id
+    tenant_id    = local.tenant_id
+    object_id    = local.object_id
+
+    key_permissions = [
+        "Get",
+        "List",
+        "Update",
+        "Create",
+        "Import",
+        "Delete",
+        "Recover",
+        "Backup",
+        "Restore",
+    ]
+
+    secret_permissions = [
+        "Get",
+        "List",
+        "Set",
+        "Delete",
+        "Recover",
+        "Backup",
+        "Restore",
+    ]
+
+    certificate_permissions = [
+        "Get",
+        "List",
+        "Update",
+        "Create",
+        "Import",
+        "Delete",
+        "Recover",
+        "Backup",
+        "Restore",
+    ]
+}
+
+data "azurerm_client_config" "current" {}
 # Create the virtual machines without using a module
 resource "azurerm_linux_virtual_machine" "vm" {
     count                 = 2
@@ -356,3 +413,19 @@ resource "azurerm_network_interface_backend_address_pool_association" "vm_nic_lb
     ip_configuration_name    = "internal"
     backend_address_pool_id  = azurerm_lb_backend_address_pool.web_lb_backend_pool.id
 }
+
+# Store the VM admin password in Key Vault
+resource "azurerm_key_vault_secret" "vm_admin_password" {
+    name         = "vm-admin-password"
+    value        = random_password.vm_password.result
+    key_vault_id = module.key_vault.key_vault_id
+}
+
+# Store the storage account key in Key Vault
+resource "azurerm_key_vault_secret" "storage_account_key" {
+    name         = "storage-account-key"
+    value        = module.storage.primary_access_key
+    key_vault_id = module.key_vault.key_vault_id
+}
+
+
