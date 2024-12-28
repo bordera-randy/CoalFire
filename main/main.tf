@@ -273,12 +273,27 @@ resource "azurerm_subnet_network_security_group_association" "management_subnet_
     network_security_group_id = azurerm_network_security_group.management_nsg.id
 }
 
+# Create a Public IP for the Load Balancer
+resource "azurerm_public_ip" "web_lb_public_ip" {
+    name                = "${local.resource_prefix}-${local.iteration}-web-lb-pip"
+    location            = local.location
+    resource_group_name = azurerm_resource_group.rg.name
+    allocation_method   = "Static"
+    sku                 = "Standard"
+    tags                = local.tags
+}
+
+
 # Create the Azure Load Balancer
 resource "azurerm_lb" "web_lb" {
     name                = "${local.resource_prefix}-${local.iteration}-web-lb"
     location            = local.location
     resource_group_name = azurerm_resource_group.rg.name
     sku                 = "Standard"
+    frontend_ip_configuration {
+        name                 = "PublicIPAddress"
+        public_ip_address_id = azurerm_public_ip.web_lb_public_ip.id
+    }
     tags                = local.tags
 }
 
@@ -312,24 +327,26 @@ resource "azurerm_lb_probe" "https_probe" {
 
 # Create the Load Balancer Rule for HTTP
 resource "azurerm_lb_rule" "http_lb_rule" {
-    name                           = "${local.resource_prefix}-${local.iteration}-http-lb-rule"
-    loadbalancer_id                = azurerm_lb.web_lb.id
-    protocol                       = "Tcp"
-    frontend_port                  = 80
-    backend_port                   = 80
-    frontend_ip_configuration_name = "PublicIPAddress"
-    probe_id                       = azurerm_lb_probe.http_probe.id
+    name                            = "${local.resource_prefix}-${local.iteration}-http-lb-rule"
+    loadbalancer_id                 = azurerm_lb.web_lb.id
+    protocol                        = "Tcp"
+    frontend_port                   = 80
+    backend_port                    = 80
+    frontend_ip_configuration_name  = "PublicIPAddress"
+    probe_id                        = azurerm_lb_probe.http_probe.id
+    backend_address_pool_ids        = azurerm_lb_backend_address_pool.web_lb_backend_pool.id
 }
 
 # Create the Load Balancer Rule for HTTPS
 resource "azurerm_lb_rule" "https_lb_rule" {
-    name                           = "${local.resource_prefix}-${local.iteration}-https-lb-rule"
-    loadbalancer_id                = azurerm_lb.web_lb.id
-    protocol                       = "Tcp"
-    frontend_port                  = 443
-    backend_port                   = 443
-    frontend_ip_configuration_name = "PublicIPAddress"
-    probe_id                       = azurerm_lb_probe.https_probe.id
+    name                            = "${local.resource_prefix}-${local.iteration}-https-lb-rule"
+    loadbalancer_id                 = azurerm_lb.web_lb.id
+    protocol                        = "Tcp"
+    frontend_port                   = 443
+    backend_port                    = 443
+    frontend_ip_configuration_name  = "PublicIPAddress"
+    probe_id                        = azurerm_lb_probe.https_probe.id
+    backend_address_pool_ids        = azurerm_lb_backend_address_pool.web_lb_backend_pool.id
 }
 
 # Associate the VMs with the Backend Address Pool

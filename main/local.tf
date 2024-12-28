@@ -1,7 +1,7 @@
 # network 
 locals {
   resource_prefix = "uc-poc-coalfire"
-  iteration = "01"
+  iteration = "02"
   location = "Central US"
   network_cidr_blocks = "10.0.0.0/16"
   tags = {
