@@ -198,8 +198,11 @@ resource "azurerm_linux_virtual_machine" "vm" {
     availability_set_id   = module.availability_set.availability_set_id
     network_interface_ids = [azurerm_network_interface.vm_nic[count.index].id]
     admin_username        = "adminuser"
-    admin_password        = random_password.vm_password.result
-    disable_password_authentication = false
+    admin_ssh_key {
+        username   = "adminuser"
+        public_key = file("~/.ssh/id_rsa_new_vm.pub")
+}
+    disable_password_authentication = true
 
     os_disk {
         caching              = "ReadWrite"
@@ -391,7 +394,7 @@ resource "azurerm_lb_rule" "http_lb_rule" {
     backend_port                    = 80
     frontend_ip_configuration_name  = "PublicIPAddress"
     probe_id                        = azurerm_lb_probe.http_probe.id
-    backend_address_pool_ids        = azurerm_lb_backend_address_pool.web_lb_backend_pool.id
+    backend_address_pool_ids        = [azurerm_lb_backend_address_pool.web_lb_backend_pool.id]
 }
 
 # Create the Load Balancer Rule for HTTPS
@@ -403,7 +406,7 @@ resource "azurerm_lb_rule" "https_lb_rule" {
     backend_port                    = 443
     frontend_ip_configuration_name  = "PublicIPAddress"
     probe_id                        = azurerm_lb_probe.https_probe.id
-    backend_address_pool_ids        = azurerm_lb_backend_address_pool.web_lb_backend_pool.id
+    backend_address_pool_ids        = [azurerm_lb_backend_address_pool.web_lb_backend_pool.id]
 }
 
 # Associate the VMs with the Backend Address Pool
@@ -418,6 +421,7 @@ resource "azurerm_network_interface_backend_address_pool_association" "vm_nic_lb
 resource "azurerm_key_vault_secret" "vm_admin_password" {
     name         = "vm-admin-password"
     value        = random_password.vm_password.result
+    content_type = "secure string"
     key_vault_id = module.key_vault.key_vault_id
 }
 
@@ -425,6 +429,7 @@ resource "azurerm_key_vault_secret" "vm_admin_password" {
 resource "azurerm_key_vault_secret" "storage_account_key" {
     name         = "storage-account-key"
     value        = module.storage.primary_access_key
+    content_type = "secure string"
     key_vault_id = module.key_vault.key_vault_id
 }
 
