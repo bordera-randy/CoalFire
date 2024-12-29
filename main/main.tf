@@ -135,7 +135,7 @@ module "key_vault" {
     source                          = "github.com/Coalfire-CF/terraform-azurerm-key-vault"
     resource_group_name             = azurerm_resource_group.rg.name
     location                        = local.location
-    kv_name                            = "${local.resource_prefix}-${local.iteration}-kv"
+    kv_name                         = "${local.resource_prefix}-${local.iteration}-kv"
     tenant_id                       = local.tenant_id
     enabled_for_disk_encryption     = true
     enabled_for_deployment          = true
@@ -147,44 +147,10 @@ module "key_vault" {
     depends_on                      = [azurerm_resource_group.rg]
 }
 
-resource "azurerm_key_vault_access_policy" "kv_access_policy" {
-    key_vault_id = module.key_vault.key_vault_id
-    tenant_id    = local.tenant_id
-    object_id    = local.object_id
-
-    key_permissions = [
-        "Get",
-        "List",
-        "Update",
-        "Create",
-        "Import",
-        "Delete",
-        "Recover",
-        "Backup",
-        "Restore",
-    ]
-
-    secret_permissions = [
-        "Get",
-        "List",
-        "Set",
-        "Delete",
-        "Recover",
-        "Backup",
-        "Restore",
-    ]
-
-    certificate_permissions = [
-        "Get",
-        "List",
-        "Update",
-        "Create",
-        "Import",
-        "Delete",
-        "Recover",
-        "Backup",
-        "Restore",
-    ]
+resource "azurerm_role_assignment" "key_vault_secrets_officer" {
+    scope                = module.key_vault.key_vault_id
+    role_definition_name = "Key Vault Secrets Officer"
+    principal_id         = local.object_id
 }
 
 data "azurerm_client_config" "current" {}
@@ -244,8 +210,11 @@ resource "azurerm_linux_virtual_machine" "manage_vm" {
     size                  = "Standard_DS1_v2"
     network_interface_ids = [azurerm_network_interface.manage_vm_nic.id]
     admin_username        = "adminuser"
-    admin_password        = random_password.vm_password.result
-    disable_password_authentication = false
+    admin_ssh_key {
+        username   = "adminuser"
+        public_key = file("~/.ssh/id_rsa_new_vm.pub")
+}
+    disable_password_authentication = true
 
     os_disk {
         caching              = "ReadWrite"
@@ -423,6 +392,7 @@ resource "azurerm_key_vault_secret" "vm_admin_password" {
     value        = random_password.vm_password.result
     content_type = "secure string"
     key_vault_id = module.key_vault.key_vault_id
+    depends_on = [ azurerm_role_assignment.key_vault_secrets_officer ]
 }
 
 # Store the storage account key in Key Vault
@@ -431,6 +401,7 @@ resource "azurerm_key_vault_secret" "storage_account_key" {
     value        = module.storage.primary_access_key
     content_type = "secure string"
     key_vault_id = module.key_vault.key_vault_id
+    depends_on = [ azurerm_role_assignment.key_vault_secrets_officer ]
 }
 
 

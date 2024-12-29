@@ -3,7 +3,7 @@ locals {
   tenant_id = "76195987-c9c2-4822-8771-4c31d24951a5"
   object_id = "3454362e-1e15-4731-9ec3-6bab4be4bacd"
   resource_prefix = "uc-poc-coalfire"
-  iteration = "03"
+  iteration = "06"
   location = "Central US"
   network_cidr_blocks = "10.0.0.0/16"
   tags = {
@@ -11,6 +11,7 @@ locals {
     purpose     = "Coalfire"
     owner       = "Randy Bordeaux"
     cost_center = "POC"
+    app_environment = "Tech Challenge"
   }
   subnets = {
     application = {
@@ -29,6 +30,22 @@ locals {
     web = {
       name       = "${local.resource_prefix}-web-sn-1"
       address_prefix = "10.0.13.0/24"
+    }
+    AzureFirewallSubnet = {
+      name       = "AzureFirewallSubnet"
+      address_prefix = "10.0.14.0/24"
+    }
+    pe = {
+      name       = "${local.resource_prefix}-pe-sn-1"
+      address_prefix = "10.0.15.0/24"
+    }
+    bastion = {
+      name       = "${local.resource_prefix}-bastion-sn-1"
+      address_prefix = "10.0.16.0/24"
+    }
+    monitor = {
+      name       = "${local.resource_prefix}-monitor-sn-1"
+      address_prefix = "10.0.17.0/24"
     }
   }
 }
