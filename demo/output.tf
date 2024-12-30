@@ -13,9 +13,14 @@ output "management_vm_name" {
 output "Log_Analytics_Workspace" {
     value = azurerm_log_analytics_workspace.law.name
 }
+output "key_data" {
+  value = azapi_resource_action.ssh_public_key_gen.output.publicKey
+}
 
+output "Load_Balancer" {
+    value = azurerm_lb.name
+}
 
-
-
-
-
+output "virtual_network" {
+    value = "${local.resource_prefix}-${local.iteration}-vnet"
+}

@@ -53,6 +53,31 @@ resource "azurerm_subnet" "subnet" {
   }
 }
 
+# Create Public IP for the Bastion Host
+resource "azurerm_public_ip" "bastion_public_ip" {
+    name                = "${local.resource_prefix}-${local.iteration}-bastion-pip"
+    location            = local.location
+    resource_group_name = azurerm_resource_group.rg.name
+    allocation_method   = "Static"
+    sku                 = "Standard"
+    tags                = local.tags
+}
+
+# Create the Bastion Host
+resource "azurerm_bastion_host" "bastion" {
+    name                = "${local.resource_prefix}-${local.iteration}-bastion"
+    location            = local.location
+    resource_group_name = azurerm_resource_group.rg.name
+    sku                 = "Standard"
+
+    ip_configuration {
+        name                 = "configuration"
+        subnet_id            = azurerm_subnet.subnet["azurerm_bastion_host"].id
+        public_ip_address_id = azurerm_public_ip.bastion_public_ip.id
+    }
+
+    depends_on = [azurerm_subnet.subnet["management"], azurerm_public_ip.manage_vm_public_ip]
+}
 
 # Create the storage account using the CoalFire module
 module "storage" {
@@ -138,20 +163,22 @@ resource "azurerm_linux_virtual_machine" "vm" {
         sku       = "18.04-LTS"
         version   = "latest"
     }
+
+    tags = local.tags
     provisioner "remote-exec" {
-    connection {
-      type        = "ssh"
-      user        = "azureuser"
-      private_key = azapi_resource_action.ssh_public_key_gen.output.privateKey
-      host        = azurerm_public_ip.vm_public_ip[count.index].ip_address
+        connection {
+            type                   = "ssh"
+            user                   = "azureuser"
+            private_key            = azapi_resource_action.ssh_public_key_gen.output.privateKey
+            host                   = azurerm_bastion_host.bastion.dns_name
+            bastion_host           = azurerm_bastion_host.bastion.dns_name
     }
 
     inline = [
-      "sudo apt update",
-      "sudo apt install apache2 -y"
+        "sudo apt update",
+        "sudo apt install apache2 -y"
     ]
-    }
-    tags = local.tags
+}
 }
 
 # Create Public IPs for the VMs
@@ -283,7 +310,7 @@ resource "azurerm_network_security_rule" "allow_ssh_from_ip" {
     protocol                    = "Tcp"
     source_port_range           = "*"
     destination_port_range      = "22"
-    source_address_prefix       = "203.0.113.0"  # Replace with the actual IP
+    source_address_prefix       = local.public_ip_to_whitelist
     destination_address_prefix  = "*"
     network_security_group_name = azurerm_network_security_group.management_nsg.name
 }
