@@ -142,6 +142,17 @@ resource "azurerm_linux_virtual_machine" "vm" {
     tags = local.tags
 }
 
+# Create Public IPs for the VMs
+resource "azurerm_public_ip" "vm_public_ip" {
+    count               = 2
+    name                = "${local.resource_prefix}-${local.iteration}-vm-pip-${count.index + 1}"
+    location            = local.location
+    resource_group_name = azurerm_resource_group.rg.name
+    allocation_method   = "Dynamic"
+    sku                 = "Standard"
+    tags                = local.tags
+}
+
 resource "azurerm_network_interface" "vm_nic" {
     count               = 2
     name                = "${local.resource_prefix}-${local.iteration}-nic-${count.index + 1}"
@@ -152,11 +163,36 @@ resource "azurerm_network_interface" "vm_nic" {
         name                          = "internal"
         subnet_id                     = azurerm_subnet.subnet["web"].id
         private_ip_address_allocation = "Dynamic"
+        public_ip_address_id          = azurerm_public_ip.vm_public_ip[count.index].id
     }
 
     tags = local.tags
 }
 
+# Create Public IP for the Management VM
+resource "azurerm_public_ip" "manage_vm_public_ip" {
+    name                = "${local.resource_prefix}-${local.iteration}-manage-vm-pip"
+    location            = local.location
+    resource_group_name = azurerm_resource_group.rg.name
+    allocation_method   = "Dynamic"
+    sku                 = "Standard"
+    tags                = local.tags
+}
+
+resource "azurerm_network_interface" "manage_vm_nic" {
+    name                = "${local.resource_prefix}-${local.iteration}-nic-3"
+    location            = local.location
+    resource_group_name = azurerm_resource_group.rg.name
+
+    ip_configuration {
+        name                          = "internal"
+        subnet_id                     = azurerm_subnet.subnet["management"].id
+        private_ip_address_allocation = "Dynamic"
+        public_ip_address_id          = azurerm_public_ip.manage_vm_public_ip.id
+    }
+
+    tags = local.tags
+}
 # Create Management Virtual Machine 
 
 # Create the virtual machines without using a module
@@ -188,19 +224,6 @@ resource "azurerm_linux_virtual_machine" "manage_vm" {
     tags = local.tags
 }
 
-resource "azurerm_network_interface" "manage_vm_nic" {
-    name                = "${local.resource_prefix}-${local.iteration}-nic-3"
-    location            = local.location
-    resource_group_name = azurerm_resource_group.rg.name
-
-    ip_configuration {
-        name                          = "internal"
-        subnet_id                     = azurerm_subnet.subnet["management"].id
-        private_ip_address_allocation = "Dynamic"
-    }
-
-    tags = local.tags
-}
 # Create a Network Security Group for the web subnet
 resource "azurerm_network_security_group" "web_nsg" {
     name                = "${local.resource_prefix}-${local.iteration}-web-nsg"
