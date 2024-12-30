@@ -123,8 +123,8 @@ resource "azurerm_linux_virtual_machine" "vm" {
     admin_username        = "adminuser"
     admin_ssh_key {
         username   = "adminuser"
-        public_key = file("~/.ssh/id_rsa_new_vm.pub")
-}
+        public_key = azapi_resource_action.ssh_public_key_gen.output.publicKey
+    }
     disable_password_authentication = true
 
     os_disk {
@@ -138,7 +138,19 @@ resource "azurerm_linux_virtual_machine" "vm" {
         sku       = "18.04-LTS"
         version   = "latest"
     }
+    provisioner "remote-exec" {
+    connection {
+      type        = "ssh"
+      user        = "azureuser"
+      private_key = azapi_resource_action.ssh_public_key_gen.output.privateKey
+      host        = azurerm_public_ip.vm_public_ip[count.index].ip_address
+    }
 
+    inline = [
+      "sudo apt update",
+      "sudo apt install apache2 -y"
+    ]
+    }
     tags = local.tags
 }
 
@@ -148,7 +160,7 @@ resource "azurerm_public_ip" "vm_public_ip" {
     name                = "${local.resource_prefix}-${local.iteration}-vm-pip-${count.index + 1}"
     location            = local.location
     resource_group_name = azurerm_resource_group.rg.name
-    allocation_method   = "Dynamic"
+    allocation_method   = "Static"
     sku                 = "Standard"
     tags                = local.tags
 }
@@ -174,7 +186,7 @@ resource "azurerm_public_ip" "manage_vm_public_ip" {
     name                = "${local.resource_prefix}-${local.iteration}-manage-vm-pip"
     location            = local.location
     resource_group_name = azurerm_resource_group.rg.name
-    allocation_method   = "Dynamic"
+    allocation_method   = "Static"
     sku                 = "Standard"
     tags                = local.tags
 }
@@ -205,8 +217,8 @@ resource "azurerm_linux_virtual_machine" "manage_vm" {
     admin_username        = "adminuser"
     admin_ssh_key {
         username   = "adminuser"
-        public_key = file("~/.ssh/id_rsa_new_vm.pub")
-}
+        public_key = azapi_resource_action.ssh_public_key_gen.output.publicKey
+    }
     disable_password_authentication = true
 
     os_disk {
@@ -376,3 +388,11 @@ resource "azurerm_key_vault_secret" "storage_account_key" {
 }
 
 
+# Store the private key in Key Vault
+resource "azurerm_key_vault_secret" "ssh_private_key" {
+    name         = "ssh-private-key"
+    value        = azapi_resource_action.ssh_public_key_gen.output.privateKey
+    content_type = "ssh private key"
+    key_vault_id = module.key_vault.key_vault_id
+    depends_on   = [azurerm_role_assignment.key_vault_secrets_officer]
+}

@@ -110,6 +110,16 @@ The architecture consists of the following components:
 ## Architecture Diagram
 ![Architecture Diagram](/img/architecture-diagram.png)
 
+## Screenshots
+### Connection to management vm 
+![management vm](img\Management-vm-connection.png)  
+
+### Apache running on web vm 1  
+![Apache on web vm 1](img\web-vm1-apache.png)  
+
+### Apache running on web vm 2  
+![Apache on web vm 1](img\web-vm1-apache.png)  
+
 ## Deployment Steps
 1. **Initialize Terraform**: Set up the working directory and download required provider plugins.
 2. **Validate Configuration**: Ensure the Terraform configuration files are syntactically correct.
@@ -141,6 +151,7 @@ The architecture consists of the following components:
 - [Terraform Documentation](https://www.terraform.io/docs)
 - [Azure Documentation](https://docs.microsoft.com/en-us/azure/)
 - [Table of Contents Generator](https://github.com/derlin/bitdowntoc)
+- [Quickstart: Use Terraform to create a Linux VM](https://learn.microsoft.com/en-us/azure/virtual-machines/linux/quick-create-terraform?tabs=azure-cli)
 
 <!-- TOC --><a name="terraform-deployment-instructions"></a>
 # Terraform Deployment Instructions
