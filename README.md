@@ -121,15 +121,15 @@ The architecture consists of the following components:
 ## Screenshots
 <!-- TOC --><a name="connection-to-management-vm"></a>
 ### Connection to management vm 
-![management vm](img\Management-vm-connection.png)  
+![management vm](/img/Management-vm-connection.png)  
 
 <!-- TOC --><a name="apache-running-on-web-vm-1"></a>
 ### Apache running on web vm 1  
-![Apache on web vm 1](img\web-vm1-apache.png)  
+![Apache on web vm 1](/img/web-vm1-apache.png)  
 
 <!-- TOC --><a name="apache-running-on-web-vm-2"></a>
 ### Apache running on web vm 2  
-![Apache on web vm 2](img\web-vm2-apache.png)  
+![Apache on web vm 2](/img/web-vm2-apache.png)  
 
 <!-- TOC --><a name="deployment-steps"></a>
 ## Deployment Steps
