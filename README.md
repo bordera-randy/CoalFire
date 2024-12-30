@@ -18,14 +18,14 @@
    * [References](#references)
 - [Terraform Deployment Instructions](#terraform-deployment-instructions)
    * [1. Prerequisites](#1-prerequisites)
-   * [3. Initialize Terraform](#3-initialize-terraform)
+   * [2. Initialize Terraform](#3-initialize-terraform)
       + [Troubleshooting:  ](#troubleshooting)
-   * [4. Validate Configuration](#4-validate-configuration)
-   * [5. Generate a Plan](#5-generate-a-plan)
-   * [6. Apply Changes](#6-apply-changes)
-   * [7. Verify Deployment  ](#7-verify-deployment)
-   * [8. Manage Terraform State](#8-manage-terraform-state)
-   * [9. Destroy Resources](#9-destroy-resources)
+   * [3. Validate Configuration](#4-validate-configuration)
+   * [4. Generate a Plan](#5-generate-a-plan)
+   * [5. Apply Changes](#6-apply-changes)
+   * [6. Verify Deployment  ](#7-verify-deployment)
+   * [7. Manage Terraform State](#8-manage-terraform-state)
+   * [8. Destroy Resources](#9-destroy-resources)
    * [Technical Requirements](#technical-requirements)
       + [Network](#network)
       + [Compute](#compute)
@@ -203,7 +203,7 @@ Before starting, ensure you have the following installed on your system:
 ---
 
 <!-- TOC --><a name="3-initialize-terraform"></a>
-## 3. Initialize Terraform
+## 2. Initialize Terraform
 In the project directory, run:  
 
 `
@@ -221,7 +221,7 @@ Ensure backend storage (e.g., Azure Storage, AWS S3) is accessible.
 Verify authentication credentials.  
 
 <!-- TOC --><a name="4-validate-configuration"></a>
-## 4. Validate Configuration
+## 3. Validate Configuration
 
 To verify the configuration syntax and logic, run:  
 
@@ -238,7 +238,7 @@ Success! The configuration is valid.
 If errors occur, address them before proceeding.
 
 <!-- TOC --><a name="5-generate-a-plan"></a>
-## 5. Generate a Plan
+## 4. Generate a Plan
 Preview changes Terraform will make:  
 
 `  
@@ -250,7 +250,7 @@ What to Check:
 - Look out for warnings or errors.  
   
 <!-- TOC --><a name="6-apply-changes"></a>
-## 6. Apply Changes
+## 5. Apply Changes
 Deploy infrastructure using:
 `  
 terraform apply
@@ -265,7 +265,7 @@ Monitor Deployment:
 Watch for any error messages.  
 Ensure resources are created successfully.  
 <!-- TOC --><a name="7-verify-deployment"></a>
-## 7. Verify Deployment  
+## 6. Verify Deployment  
 Log in to your cloud provider portal.  
 Confirm that resources match the Terraform configuration.  
 
@@ -273,13 +273,13 @@ Retrieve outputs using:
 `  terraform output `  
 
 <!-- TOC --><a name="8-manage-terraform-state"></a>
-## 8. Manage Terraform State
+## 7. Manage Terraform State
 Terraform maintains a state file (terraform.tfstate) to track resources. 
 It is recommended to store this file in a storage account. 
 
 
 <!-- TOC --><a name="9-destroy-resources"></a>
-## 9. Destroy Resources
+## 8. Destroy Resources
 To clean up resources managed by Terraform:  
 ` terraform destroy `  
 
