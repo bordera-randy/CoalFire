@@ -1,31 +1,35 @@
-<!-- TOC start (generated with https://github.com/derlin/bitdowntoc) -->
+# Table of Contents
 - [CoalFire Proof-of-concept Azure environment using Terraform](#coalfire-proof-of-concept-azure-environment-using-terraform)
-  - [Challenge Overview](#challenge-overview)
-  - [Deliverables](#deliverables)
-  - [Evaluation Criteria](#evaluation-criteria)
-  - [Guidelines](#guidelines)
+   * [Challenge Overview](#challenge-overview)
+   * [Deliverables](#deliverables)
+   * [Evaluation Criteria](#evaluation-criteria)
+   * [Guidelines](#guidelines)
 - [Solution Overview](#solution-overview)
-  - [Introduction](#introduction)
-  - [Architecture](#architecture)
-  - [Architecture Diagram](#architecture-diagram)
-  - [Deployment Steps](#deployment-steps)
-  - [Design Decisions](#design-decisions)
-  - [Assumptions](#assumptions)
-  - [References](#references)
+   * [Introduction](#introduction)
+   * [Architecture](#architecture)
+   * [Architecture Diagram](#architecture-diagram)
+   * [Screenshots](#screenshots)
+      + [Connection to management vm ](#connection-to-management-vm)
+      + [Apache running on web vm 1  ](#apache-running-on-web-vm-1)
+      + [Apache running on web vm 2  ](#apache-running-on-web-vm-2)
+   * [Deployment Steps](#deployment-steps)
+   * [Design Decisions](#design-decisions)
+   * [Assumptions](#assumptions)
+   * [References](#references)
 - [Terraform Deployment Instructions](#terraform-deployment-instructions)
-  - [1. Prerequisites](#1-prerequisites)
-  - [3. Initialize Terraform](#3-initialize-terraform)
-    - [Troubleshooting:](#troubleshooting)
-  - [4. Validate Configuration](#4-validate-configuration)
-  - [5. Generate a Plan](#5-generate-a-plan)
-  - [6. Apply Changes](#6-apply-changes)
-  - [7. Verify Deployment](#7-verify-deployment)
-  - [8. Manage Terraform State](#8-manage-terraform-state)
-  - [9. Destroy Resources](#9-destroy-resources)
-  - [Technical Requirements](#technical-requirements)
-    - [Network](#network)
-    - [Compute](#compute)
-    - [Supporting Infrastructure](#supporting-infrastructure)
+   * [1. Prerequisites](#1-prerequisites)
+   * [3. Initialize Terraform](#3-initialize-terraform)
+      + [Troubleshooting:  ](#troubleshooting)
+   * [4. Validate Configuration](#4-validate-configuration)
+   * [5. Generate a Plan](#5-generate-a-plan)
+   * [6. Apply Changes](#6-apply-changes)
+   * [7. Verify Deployment  ](#7-verify-deployment)
+   * [8. Manage Terraform State](#8-manage-terraform-state)
+   * [9. Destroy Resources](#9-destroy-resources)
+   * [Technical Requirements](#technical-requirements)
+      + [Network](#network)
+      + [Compute](#compute)
+      + [Supporting Infrastructure](#supporting-infrastructure)
 
 <!-- TOC end -->
 
@@ -90,9 +94,11 @@ We evaluate tech challenges based on:
 <!-- TOC --><a name="solution-overview"></a>
 # Solution Overview
 
+<!-- TOC --><a name="introduction"></a>
 ## Introduction
 This solution aims to create a proof-of-concept Azure environment using Terraform. The environment will host a basic web server with proper network segmentation and security controls. The solution leverages Coalfire’s open-source Terraform modules to ensure best practices and efficient resource management.
 
+<!-- TOC --><a name="architecture"></a>
 ## Architecture
 The architecture consists of the following components:
 - **Virtual Network (VNet)**: A single VNet with multiple subnets to segregate different types of resources.
@@ -107,26 +113,39 @@ The architecture consists of the following components:
 - **Load Balancer**: Distributes incoming web traffic across the web VMs.
 - **Storage Account**: Used for storing Terraform state files and web logs.
 
+<!-- TOC --><a name="architecture-diagram"></a>
 ## Architecture Diagram
 ![Architecture Diagram](/img/architecture-diagram.png)
 
+<!-- TOC --><a name="screenshots"></a>
 ## Screenshots
+<!-- TOC --><a name="connection-to-management-vm"></a>
 ### Connection to management vm 
 ![management vm](img\Management-vm-connection.png)  
 
+<!-- TOC --><a name="apache-running-on-web-vm-1"></a>
 ### Apache running on web vm 1  
 ![Apache on web vm 1](img\web-vm1-apache.png)  
 
+<!-- TOC --><a name="apache-running-on-web-vm-2"></a>
 ### Apache running on web vm 2  
 ![Apache on web vm 2](img\web-vm2-apache.png)  
 
+<!-- TOC --><a name="deployment-steps"></a>
 ## Deployment Steps
-1. **Initialize Terraform**: Set up the working directory and download required provider plugins.
-2. **Validate Configuration**: Ensure the Terraform configuration files are syntactically correct.
-3. **Generate a Plan**: Create an execution plan to preview the changes Terraform will make to the infrastructure.
-4. **Apply Changes**: Execute the plan to create the resources in Azure.
-5. **Verify Deployment**: Confirm that all resources are created as expected and the web server is accessible.
+1. **Initialize Terraform**
+- Set up the working directory and download required provider plugins.
+2. **Validate Configuration**
+- Ensure the Terraform configuration files are syntactically correct.
+3. **Generate a Plan**
+- Create an execution plan to preview the changes Terraform will make to the infrastructure.
+4. **Apply Changes**
+- Execute the plan to create the resources in Azure.
+5. **Verify Deployment**
+- Confirm that all resources are created as expected and the web server is accessible.
+- Log into each server
 
+<!-- TOC --><a name="design-decisions"></a>
 ## Design Decisions
 - **Network Segmentation**
   - Subnets are used to isolate different types of resources, enhancing security and manageability.
@@ -137,27 +156,30 @@ The architecture consists of the following components:
   - Firwall should be placed on the virtual network to control North-South traffic.
 - **Notes**  
    - Virtual Machines were created without the use of modules. This was due to CoalFire not having a Linux module published. This also demonstrates the creation of resources without the use of a module. 
-   - Virtual machine passwords were generated in the terraform randomly.
+   - Virtual machine SSH keys were generated in the terraform and stored in the key vault.
    - variables are stored in local variables rather than tfvars file, this is personal preference. When building pipelines using local variables is easier to link to runtime parameters. 
    - Install Commands for Apache
       - `sudo apt update` 
       - `sudo apt install apache2 -y`  Install Apache  
       - `sudo systemctl status apache2` Verify Installation  
    - Apache was installed manually due to an issue with zscaler causing a timeout. The code was added to the terraform to automate the install, it is currently commented out.
-   - The SSH keys are generated and stored in the key vault 
+   
 
 
+<!-- TOC --><a name="assumptions"></a>
 ## Assumptions
 - The user has access to an Azure subscription with sufficient permissions to create the required resources.
 - Terraform and Azure CLI are installed and configured on the user's machine.
 
 
+<!-- TOC --><a name="references"></a>
 ## References
 - [Coalfire-CF Terraform Modules](https://github.com/orgs/Coalfire-CF/repositories?q=visibility:public+terraform-azure)
 - [Terraform Documentation](https://www.terraform.io/docs)
 - [Azure Documentation](https://docs.microsoft.com/en-us/azure/)
 - [Table of Contents Generator](https://github.com/derlin/bitdowntoc)
 - [Quickstart: Use Terraform to create a Linux VM](https://learn.microsoft.com/en-us/azure/virtual-machines/linux/quick-create-terraform?tabs=azure-cli)
+- [Mermaid Live Editor](https://mermaid.live/)  
 
 <!-- TOC --><a name="terraform-deployment-instructions"></a>
 # Terraform Deployment Instructions
@@ -252,7 +274,8 @@ Retrieve outputs using:
 
 <!-- TOC --><a name="8-manage-terraform-state"></a>
 ## 8. Manage Terraform State
-Terraform maintains a state file (terraform.tfstate) to track resources.  
+Terraform maintains a state file (terraform.tfstate) to track resources. 
+It is recommended to store this file in a storage account. 
 
 
 <!-- TOC --><a name="9-destroy-resources"></a>
