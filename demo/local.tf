@@ -17,24 +17,24 @@ locals {
   subnets = {
     application = {
       name       = "${local.resource_prefix}-application-sn-1"
-      address_prefix = "10.0.0.0/24"
+      address_prefix = "10.0.1.0/24"
     }
     management = {
       name       = "${local.resource_prefix}-management-sn-1"
-      address_prefix = "10.0.1.0/24"
+      address_prefix = "10.0.2.0/24"
       subnet_service_endpoints = ["Microsoft.Storage"]
     }
     backend = {
       name       = "${local.resource_prefix}-backend-sn-1"
-      address_prefix = "10.0.2.0/24"
+      address_prefix = "10.0.3.0/24"
     }
     web = {
       name       = "${local.resource_prefix}-web-sn-1"
-      address_prefix = "10.0.3.0/24"
+      address_prefix = "10.0.4.0/24"
     }
     azurerm_bastion_host = {
       name       = "AzureBastionSubnet"
-      address_prefix = "10.0.4.0/24"
+      address_prefix = "10.0.5.0/24"
     }
   }
 }
