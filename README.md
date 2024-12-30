@@ -113,12 +113,12 @@ The architecture consists of the following components:
 ## Screenshots
 ### Connection to management vm 
 ![management vm](img\Management-vm-connection.png)  
-
+![alt text](image.png)
 ### Apache running on web vm 1  
 ![Apache on web vm 1](img\web-vm1-apache.png)  
 
 ### Apache running on web vm 2  
-![Apache on web vm 1](img\web-vm1-apache.png)  
+![Apache on web vm 2](img\web-vm2-apache.png)  
 
 ## Deployment Steps
 1. **Initialize Terraform**: Set up the working directory and download required provider plugins.
@@ -139,6 +139,12 @@ The architecture consists of the following components:
    - Virtual Machines were created without the use of modules. This was due to CoalFire not having a Linux module published. This also demonstrates the creation of resources without the use of a module. 
    - Virtual machine passwords were generated in the terraform randomly.
    - variables are stored in local variables rather than tfvars file, this is personal preference. When building pipelines using local variables is easier to link to runtime parameters. 
+   - Install Commands for Apache
+    - `  
+    sudo apt update  
+    sudo apt install apache2 -y  
+    sudo systemctl status apache2  
+    `  
 
 
 ## Assumptions

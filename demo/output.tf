@@ -18,7 +18,7 @@ output "key_data" {
 }
 
 output "Load_Balancer" {
-    value = azurerm_lb.name
+    value = azurerm_lb.web_lb.name
 }
 
 output "virtual_network" {

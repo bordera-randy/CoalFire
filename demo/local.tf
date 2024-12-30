@@ -3,7 +3,7 @@ locals {
   tenant_id = "76195987-c9c2-4822-8771-4c31d24951a5"
   object_id = "3454362e-1e15-4731-9ec3-6bab4be4bacd"
   resource_prefix = "uc-poc-coalfire"
-  iteration = "21"
+  iteration = "24"
   public_ip_to_whitelist = "170.85.100.119"
   location = "Central US"
   network_cidr_blocks = "10.0.0.0/16"
