@@ -113,7 +113,7 @@ The architecture consists of the following components:
 ## Screenshots
 ### Connection to management vm 
 ![management vm](img\Management-vm-connection.png)  
-![alt text](image.png)
+
 ### Apache running on web vm 1  
 ![Apache on web vm 1](img\web-vm1-apache.png)  
 
@@ -140,17 +140,17 @@ The architecture consists of the following components:
    - Virtual machine passwords were generated in the terraform randomly.
    - variables are stored in local variables rather than tfvars file, this is personal preference. When building pipelines using local variables is easier to link to runtime parameters. 
    - Install Commands for Apache
-    - `  
-    sudo apt update  
-    sudo apt install apache2 -y  
-    sudo systemctl status apache2  
-    `  
+      - `sudo apt update` 
+      - `sudo apt install apache2 -y`  Install Apache  
+      - `sudo systemctl status apache2` Verify Installation  
+   - Apache was installed manually due to an issue with zscaler causing a timeout. The code was added to the terraform to automate the install, it is currently commented out.
+   - The SSH keys are generated and stored in the key vault 
 
 
 ## Assumptions
 - The user has access to an Azure subscription with sufficient permissions to create the required resources.
 - Terraform and Azure CLI are installed and configured on the user's machine.
-- The necessary SSH keys are available for secure access to the VMs.
+
 
 ## References
 - [Coalfire-CF Terraform Modules](https://github.com/orgs/Coalfire-CF/repositories?q=visibility:public+terraform-azure)
